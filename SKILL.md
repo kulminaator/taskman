@@ -38,7 +38,9 @@ available task folders (if any). Never guess a different task.
    concise steps**. Each step must be short enough to complete in **15 minutes
    or less**. Prefer more, smaller steps over fewer, larger ones. Every step
    must be concrete: say exactly what file(s) to touch, what to write, and how
-   to verify it worked.
+   to verify it worked. This is the only chance to define the step structure:
+   keep splitting until every step is genuinely small, because the structure
+   will never be reworked later — re-splitting during execution is forbidden.
 3. Create the task structure:
 
    ```text
@@ -133,11 +135,14 @@ read these files earlier in the session:
 - **Reading rule:** whenever the plan says to read `README.md`,
   `GUIDELINES.md`, `task.md`, or `step.md`, actually read the file with the
   read tool at that moment. Never rely on memory or assumptions.
-- **Step size rule:** no step should take more than 15 minutes. If a step
-  turns out to be bigger than that in practice, record that in its step
-  comments and, with the user's agreement, split it into additional
-  `step-NNN` folders at the end (or in place, renumbering, only if the user
-  agrees).
+- **Step size rule:** no step should take more than 15 minutes. All splitting
+  into small steps happens during **create** (initial planning) — invest the
+  effort there, splitting until every step is small and concrete. During
+  execute, splitting, merging, inserting, deleting, or renumbering steps is
+  **forbidden**. If a step turns out to be too big in practice, do not
+  restructure the task: record that in its step comments, do as much of the
+  step as is reasonable, and let the user decide what to do (finish it anyway,
+  mark it failed, or create a follow-up task via a new `taskman create`).
 - **Single-focus rule:** during execute, exactly one step is in play at a
   time. No parallel or opportunistic work.
 - **Comments rule:** comments are append-only; never delete or rewrite
