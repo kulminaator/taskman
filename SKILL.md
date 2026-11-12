@@ -17,14 +17,19 @@ taskman execute <task-name>
 
 **Task-name** may be a single word or multiple words. When it is multiple words
 the user must pass it in double quotes (e.g. `taskman create "refactor auth" "..."`).
-Treat the quoted phrase as one task name; store the folder under `.taskman/`
-using the name with spaces preserved (or hyphenated, but consistently — pick
-hyphenated lowercase for folder safety, e.g. `refactor-auth`).
+Treat the quoted phrase as one task name. The TASK_HOME folder name is derived
+deterministically: lowercase the name and replace spaces with single hyphens
+(e.g. `"Refactor Auth"` → `.taskman/refactor-auth/`). Both `create` and
+`execute` must derive the folder name exactly this way.
 
-If the user asks to `taskman execute` (or `create` against an existing task with
-a "find the task" intent) and the task cannot be found under `.taskman/`,
-**tell the user clearly** that no task with that name exists and list the
-available task folders (if any). Never guess a different task.
+**Task not found (execute):** if `.taskman/<task-name>/` or its `task.md`
+does not exist, tell the user clearly that no task with that name exists and
+list the available task folders under `.taskman/` (if any). Never guess a
+different task.
+
+**Task already exists (create):** if the TASK_HOME folder already exists, tell
+the user and stop. Do not overwrite or merge into an existing task unless the
+user explicitly asks.
 
 ---
 
@@ -41,7 +46,8 @@ available task folders (if any). Never guess a different task.
    to verify it worked. This is the only chance to define the step structure:
    keep splitting until every step is genuinely small, because the structure
    will never be reworked later — re-splitting during execution is forbidden.
-3. Create the task structure:
+3. Create the task structure (first check the TASK_HOME folder does not
+   already exist — see *Task already exists (create)* above):
 
    ```text
    .taskman/
@@ -94,13 +100,18 @@ read these files earlier in the session:
 2. **Read the task**: read `.taskman/<task-name>/task.md` carefully. If the
    task folder or `task.md` does not exist, tell the user the task was not
    found and stop.
-3. **Find the first unfinished step**: scan the `step-*` folders in numeric
-   order and pick the first step whose `status` file is not `done`. That is the
-   step to work on now.
-   - If every step is `done`: congratulate the user, note the task is complete,
-     and (if git is allowed) commit any remaining step changes.
-   - If a step's status is `failed`, mention it when you reach it and ask the
-     user whether to retry or skip before touching it.
+3. **Find the first step to work on**: scan the `step-*` folders in numeric
+   order and pick the first step whose `status` is `pending` or
+   `in-progress`. That is the step to work on now.
+   - `failed` steps are not automatically selected. When the scan passes a
+     `failed` step, report it and ask the user whether to retry or skip it
+     **once**; if the user says skip, append a `skipped by user` bullet to
+     that step's `step.md` comments and move past it without asking again in
+     this run.
+   - If there are no `pending`/`in-progress` steps left: end the run with a
+     summary — count of `done` steps and any `failed`/skipped steps. If all
+     steps are `done`, note the task is complete, and (if git is allowed)
+     commit any remaining step changes.
 4. **Announce the start**: tell the user the number of the step you started,
    e.g. "Starting step-003: <short title>". Write `in-progress` into that
    step's `status` file.
@@ -124,8 +135,9 @@ read these files earlier in the session:
    `taskman: complete step-003 — <title>`). Task bookkeeping files
    (`status`, `step.md` comments) may be included in the same commit.
 9. **Continue**: find the next step in sequence after the one just finished
-   (the next not-`done` `step-*` folder) and repeat from point 4. Continue
-   until all steps are done, the user stops you, or a step fails and needs the
+   (the next `pending`/`in-progress` `step-*` folder, passing skipped `failed`
+   steps as described in point 3) and repeat from point 4. Continue until no
+   workable step remains, the user stops you, or a step fails and needs the
    user's decision.
 
 ---
