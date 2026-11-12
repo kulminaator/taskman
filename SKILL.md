@@ -56,7 +56,9 @@ available task folders (if any). Never guess a different task.
 
    - `task.md`: use the template in `templates/task.md` (relative to this skill
      directory). It holds a high-level description of the task, the ordered
-     step list, and a `## Comments` section that starts **empty**.
+     step list (titles only — do **not** track step statuses in `task.md`; the
+     `status` files are the single source of truth), and a `## Comments`
+     section that starts **empty**.
    - Each step folder is named `step-001`, `step-002`, … zero-padded to three
      digits, numbered in execution order.
    - Each step folder contains a file named `status` whose content is exactly

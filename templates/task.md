@@ -8,12 +8,10 @@ by the user.>
 
 ## Steps
 
-| Step | Title | Status |
-|------|-------|--------|
-| step-001 | <short title> | pending |
-| step-002 | <short title> | pending |
+1. step-001 — <short title>
+2. step-002 — <short title>
 
-*(Status column mirrors each `step-NNN/status` file.)*
+*(Step statuses are tracked only in each `step-NNN/status` file, never here.)*
 
 ## Comments
 
