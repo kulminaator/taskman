@@ -45,16 +45,76 @@ taskman execute "refactor auth"
 
 ## Installation
 
-Pi discovers skills as directories containing `SKILL.md`. To use this skill,
-place (or symlink) this folder in a skills location, e.g.:
+`taskman` follows the open [Agent Skills](https://agentskills.io) standard, so
+it works with any agent that supports skills. The idea is always the same:
+make this folder available under the agent's skills directory under the name
+`taskman`, so `SKILL.md` sits directly inside `.../skills/taskman/`.
 
-```text
-.agents/skills/taskman/SKILL.md          # project skill
-~/.agents/skills/taskman/SKILL.md        # user skill
+A symlink to a clone of this repo works everywhere below and keeps the skill
+up to date when you `git pull`; a plain `git clone` (or copy) works too:
+
+```bash
+git clone https://github.com/Kulminaator/taskman /path/to/taskman
 ```
 
-Then invoke it with `/skill:taskman taskman execute my-task` or just ask the
-agent to use taskman.
+### Pi
+
+```bash
+mkdir -p ~/.agents/skills
+ln -s /path/to/taskman ~/.agents/skills/taskman
+```
+
+Project-wide instead: `.agents/skills/taskman`. Restart Pi to pick it up,
+then invoke with `/skill:taskman` or just describe your task.
+
+### Claude Code
+
+```bash
+mkdir -p ~/.claude/skills
+ln -s /path/to/taskman ~/.claude/skills/taskman
+```
+
+Project-wide instead: commit the skill to `.claude/skills/taskman` in the
+repository. Symlinked skill folders are supported. Restart Claude Code to
+pick up a new skills directory (it watches skills dirs while running). Invoke
+with `/taskman`, or ask and Claude loads the skill when the request matches
+its description.
+
+### OpenAI Codex
+
+```bash
+mkdir -p ~/.agents/skills
+ln -s /path/to/taskman ~/.agents/skills/taskman
+```
+
+Project-wide instead: `.agents/skills/taskman` at the repository root (Codex
+scans `.agents/skills` from the current directory up to the repo root).
+Symlinked skill folders are supported. Codex detects skill changes
+automatically; restart it if a new skill doesn't appear. Invoke with
+`$taskman` or `/skills`, or describe your task.
+
+### OpenCode
+
+```bash
+mkdir -p ~/.opencode/skills
+ln -s /path/to/taskman ~/.opencode/skills/taskman
+```
+
+Project-wide instead: `.opencode/skills/taskman` in the project root. OpenCode
+loads the skill's full instructions when your request matches its
+description, or reference it directly in your prompt.
+
+### Other agents
+
+Any agent implementing the Agent Skills standard works, as long as the folder
+containing `SKILL.md` sits in a location that agent scans for skills.
+
+Once installed, ask the agent things like:
+
+```text
+taskman create "refactor auth" "Split the login module into ..."
+taskman execute "refactor auth"
+```
 
 ## License
 
