@@ -9,6 +9,11 @@ time — always re-reading the project docs and the task/step plans first,
 logging findings into comment sections, tracking status per step, and (when a
 git repo allows it) committing the work step by step.
 
+Both commands start by reading the project's `README.md` and `GUIDELINES.md`
+if they exist (`execute` looks in the project root and in the parent folders
+of the current directory). Those docs also govern git: taskman only commits if
+neither of them prohibits it.
+
 ## Commands
 
 ```text
@@ -23,6 +28,12 @@ taskman create "refactor auth" "Split the login module into ..."
 taskman execute "refactor auth"
 ```
 
+The `TASK_HOME` folder name is derived deterministically from the task name:
+lowercased, with spaces collapsed into single hyphens — `"Refactor Auth"`
+becomes `.taskman/refactor-auth/`. `create` and `execute` derive it the same
+way, so you can always predict (or recover) the folder name from the name you
+typed.
+
 ## Layout created by taskman
 
 ```text
@@ -35,8 +46,33 @@ taskman execute "refactor auth"
     └── step-002/ ...
 ```
 
+Each `status` file holds exactly one word: `pending`, `in-progress`, `done`,
+or `failed`. Status files are the single source of truth — `task.md` lists the
+steps but never their statuses.
+
+## Behavior worth knowing
+
+- **Task not found:** `taskman execute` for an unknown name reports that no
+  such task exists and lists the folders under `.taskman/`. It never guesses a
+  similar task.
+- **Task already exists:** `taskman create` refuses to overwrite or merge into
+  an existing `TASK_HOME` and stops.
+- **Step structure is frozen after planning.** All splitting happens during
+  `create`; `execute` never splits, merges, inserts, deletes, or renumbers
+  steps. If a step turns out too big in practice, that is recorded in its
+  comments and the decision is left to you.
+- **Failed steps are not retried automatically.** When the scan passes a
+  `failed` step, taskman reports it and asks once whether to retry or skip it;
+  a skip is recorded as a `skipped by user` bullet in that step's `step.md`.
+- **Comments are append-only.** Step-specific findings go under `## Step
+  comments` in `step.md`, project-wide findings under `## Comments` in
+  `task.md`; existing comments are never rewritten.
+- **One step at a time.** `execute` works on a single step and does not do
+  opportunistic out-of-scope fixes.
+
 ## Files in this repo
 
+- `README.md` — this file
 - `SKILL.md` — the skill instructions (entry point)
 - `templates/task.md` — template for `task.md`
 - `templates/step.md` — template for every `step.md`
@@ -54,8 +90,13 @@ A symlink to a clone of this repo works everywhere below and keeps the skill
 up to date when you `git pull`; a plain `git clone` (or copy) works too:
 
 ```bash
-git clone https://github.com/Kulminaator/taskman /path/to/taskman
+# Point this at wherever the taskman repo actually lives; the clone location
+# is free, only the link name inside the skills directory has to be taskman.
+git clone <taskman-repo-url> /path/to/taskman
 ```
+
+> TODO: once the repository is published, put its URL here (the previously
+> documented `github.com/Kulminaator/taskman` currently returns 404).
 
 ### Pi
 
@@ -64,8 +105,13 @@ mkdir -p ~/.agents/skills
 ln -s /path/to/taskman ~/.agents/skills/taskman
 ```
 
-Project-wide instead: `.agents/skills/taskman`. Restart Pi to pick it up,
-then invoke with `/skill:taskman` or just describe your task.
+Project-wide instead: `.agents/skills/taskman` (Pi scans it from the working
+directory up through its ancestors, stopping at the repository root).
+
+Pi scans skill locations at startup, so start a new session to see a newly
+added skill; use `/reload` to pick up edits to a skill you are already using.
+Invoke with `/skill:taskman` (arguments after it are passed along, e.g.
+`/skill:taskman execute "refactor auth"`), or just describe your task.
 
 ### Claude Code
 
@@ -75,10 +121,12 @@ ln -s /path/to/taskman ~/.claude/skills/taskman
 ```
 
 Project-wide instead: commit the skill to `.claude/skills/taskman` in the
-repository. Symlinked skill folders are supported. Restart Claude Code to
-pick up a new skills directory (it watches skills dirs while running). Invoke
-with `/taskman`, or ask and Claude loads the skill when the request matches
-its description.
+repository. Symlinked skill folders are supported. Claude Code watches skills
+directories while it runs, so edits are picked up in the current session; if
+you just created the top-level skills directory itself, run `/reload-skills`
+(run it again after later changes there, since it is not watched yet). Run
+`/skills` to confirm the skill loaded. Invoke with `/taskman`, or ask and
+Claude loads the skill when the request matches its description.
 
 ### OpenAI Codex
 
@@ -96,13 +144,19 @@ automatically; restart it if a new skill doesn't appear. Invoke with
 ### OpenCode
 
 ```bash
-mkdir -p ~/.opencode/skills
-ln -s /path/to/taskman ~/.opencode/skills/taskman
+mkdir -p ~/.config/opencode/skills
+ln -s /path/to/taskman ~/.config/opencode/skills/taskman
 ```
 
-Project-wide instead: `.opencode/skills/taskman` in the project root. OpenCode
-loads the skill's full instructions when your request matches its
-description, or reference it directly in your prompt.
+Project-wide instead: `.opencode/skills/taskman` in the project root (OpenCode
+searches from the current directory up to the project root). OpenCode also
+reads the compatibility locations `~/.agents/skills`, `.agents/skills`,
+`~/.claude/skills`, and `.claude/skills`, so a single link into any of those
+serves OpenCode, Codex, and Pi at once.
+
+OpenCode advertises the skill when it is relevant and loads the full
+instructions on demand via the `skill` tool; you can also reference it
+directly in your prompt.
 
 ### Other agents
 
