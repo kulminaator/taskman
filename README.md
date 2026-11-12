@@ -1,5 +1,26 @@
 # taskman
 
+## TL;DR
+
+Big scary task → tiny boring steps → done one at a time, in your repo, in git.
+
+```text
+you  ➜ taskman create "refactor auth" "Split the login module into ..."
+tman ➜ 9 steps, ≤15 min each, filed under .taskman/refactor-auth/
+you  ➜ taskman execute "refactor auth"
+tman ➜ step-001 ✅  commit  step-002 ✅  commit  step-003 🚧 ...
+```
+
+- The plan is plain markdown in your repo, not a chat log you have to re-run.
+- Exactly one step in play at a time. No drive-by "helpful" refactors.
+- `status` files are the source of truth: `pending` → `in-progress` → `done`.
+- Every gotcha learned mid-step gets written down for whoever runs it next.
+- It commits as it goes, unless your project docs say don't.
+
+Still here? The rest is the fine print. 🎺
+
+---
+
 A coding-agent skill for project task management, following the
 [Agent Skills](https://agentskills.io/specification) specification.
 
