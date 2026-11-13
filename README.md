@@ -111,13 +111,10 @@ A symlink to a clone of this repo works everywhere below and keeps the skill
 up to date when you `git pull`; a plain `git clone` (or copy) works too:
 
 ```bash
-# Point this at wherever the taskman repo actually lives; the clone location
+# The repo lives at https://github.com/kulminaator/taskman; the clone location
 # is free, only the link name inside the skills directory has to be taskman.
-git clone <taskman-repo-url> /path/to/taskman
+git clone https://github.com/kulminaator/taskman.git /path/to/taskman
 ```
-
-> TODO: once the repository is published, put its URL here (the previously
-> documented `github.com/Kulminaator/taskman` currently returns 404).
 
 ### Pi
 
