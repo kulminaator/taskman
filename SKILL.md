@@ -46,6 +46,7 @@ user explicitly asks.
    to verify it worked. This is the only chance to define the step structure:
    keep splitting until every step is genuinely small, because the structure
    will never be reworked later — re-splitting during execution is forbidden.
+   Stay compact in the wording of steps but do not omit important details.
 3. Create the task structure (first check the TASK_HOME folder does not
    already exist — see *Task already exists (create)* above):
 
@@ -82,6 +83,7 @@ user explicitly asks.
    unrelated that the user had staged/unstaged.
 
 5. Report to the user: the TASK_HOME path and the numbered list of steps created.
+6. Important! Do not forget to create the task and step files.
 
 ---
 
@@ -139,14 +141,16 @@ read these files earlier in the session:
    steps as described in point 3) and repeat from point 4. Continue until no
    workable step remains, the user stops you, or a step fails and needs the
    user's decision.
+10. Important! Do not consider your actions complete before all the steps in 
+   the task have been handled and reached done!
 
 ---
 
 ## Overall rules
 
 - **Reading rule:** whenever the plan says to read `README.md`,
-  `GUIDELINES.md`, `task.md`, or `step.md`, actually read the file with the
-  read tool at that moment. Never rely on memory or assumptions.
+  `GUIDELINES.md`, `task.md`, or `step.md`, actually read the whole file with 
+  the read tool at that moment. Never rely on memory or assumptions.
 - **Step size rule:** no step should take more than 15 minutes. All splitting
   into small steps happens during **create** (initial planning) — invest the
   effort there, splitting until every step is small and concrete. During
